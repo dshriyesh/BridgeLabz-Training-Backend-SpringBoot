@@ -1,0 +1,202 @@
+{
+  "info": {
+    "name": "Fundoo Notes API",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth",
+      "item": [
+        {
+          "name": "Register",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/register" },
+            "body": { "mode": "raw", "raw": "{\n  \"firstName\":\"John\",\n  \"lastName\":\"Doe\",\n  \"email\":\"john@example.com\",\n  \"username\":\"johnny\",\n  \"password\":\"Password@123\"\n}" }
+          }
+        },
+        {
+          "name": "Verify Email",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/verify-email" },
+            "body": { "mode": "raw", "raw": "{\n  \"token\":\"PASTE_EMAIL_VERIFICATION_TOKEN\"\n}" }
+          }
+        },
+        {
+          "name": "Verify Email (Link)",
+          "request": {
+            "method": "GET",
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/verify-email?token={{emailVerificationToken}}" }
+          }
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "const json = pm.response.json();",
+                  "if (json.data && json.data.accessToken) pm.environment.set('token', json.data.accessToken);",
+                  "if (json.data && json.data.refreshToken) pm.environment.set('refreshToken', json.data.refreshToken);"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/login" },
+            "body": { "mode": "raw", "raw": "{\n  \"emailOrUsername\":\"johnny\",\n  \"password\":\"Password@123\"\n}" }
+          }
+        },
+        {
+          "name": "Refresh",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/refresh" },
+            "body": { "mode": "raw", "raw": "{\n  \"refreshToken\":\"{{refreshToken}}\"\n}" }
+          }
+        },
+        {
+          "name": "Logout",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/logout" }
+          }
+        },
+        {
+          "name": "Forgot Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/forgot-password" },
+            "body": { "mode": "raw", "raw": "{\n  \"email\":\"john@example.com\"\n}" }
+          }
+        },
+        {
+          "name": "Verify OTP",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/verify-otp" },
+            "body": { "mode": "raw", "raw": "{\n  \"email\":\"john@example.com\",\n  \"otp\":\"123456\"\n}" }
+          }
+        },
+        {
+          "name": "Reset Password",
+          "request": {
+            "method": "POST",
+            "header": [{ "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/auth/reset-password" },
+            "body": { "mode": "raw", "raw": "{\n  \"email\":\"john@example.com\",\n  \"otp\":\"123456\",\n  \"newPassword\":\"NewPassword@123\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Users",
+      "item": [
+        {
+          "name": "Get Profile",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/profile" }
+          }
+        },
+        {
+          "name": "Update Profile",
+          "request": {
+            "method": "PUT",
+            "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }, { "key": "Content-Type", "value": "application/json" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/users/profile" },
+            "body": { "mode": "raw", "raw": "{\n  \"firstName\":\"John\",\n  \"lastName\":\"Doe Updated\"\n}" }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Notes",
+      "item": [
+        {"name":"Create Note","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/v1/notes"},"body":{"mode":"raw","raw":"{\n  \"title\":\"My Note\",\n  \"description\":\"Description\",\n  \"color\":\"yellow\"\n}"}}},
+        {"name":"List Notes","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notes?page=0&size=10&sortBy=updatedDate&direction=desc"}}},
+        {"name":"Filter Notes","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notes?title=note&description=desc&color=yellow&pinned=false&archived=false&trashed=false&fromDate=2026-05-01&toDate=2026-05-31&reminderFrom=2026-05-01T00:00:00&reminderTo=2026-05-31T23:59:59"}}},
+        {"name":"Get Note By Id","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notes/{{noteId}}"}}},
+        {"name":"Update Note","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/v1/notes/{{noteId}}"},"body":{"mode":"raw","raw":"{\n  \"title\":\"Updated Note\",\n  \"description\":\"Updated\",\n  \"color\":\"green\"\n}"}}},
+        {"name":"Pin Note","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notes/pin/{{noteId}}"}}},
+        {"name":"Archive Note","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notes/archive/{{noteId}}"}}},
+        {"name":"Trash Note","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notes/trash/{{noteId}}"}}},
+        {"name":"Delete Note","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notes/{{noteId}}"}}}
+      ]
+    },
+    {
+      "name": "Labels",
+      "item": [
+        {"name":"Create Label","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/v1/labels"},"body":{"mode":"raw","raw":"{\n  \"name\":\"Work\"\n}"}}},
+        {"name":"List Labels","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/labels"}}},
+        {"name":"Update Label","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/v1/labels/{{labelId}}"},"body":{"mode":"raw","raw":"{\n  \"name\":\"Personal\"\n}"}}},
+        {"name":"Delete Label","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/labels/{{labelId}}"}}}
+      ]
+    },
+    {
+      "name": "Reminders",
+      "item": [
+        {"name":"Create Reminder","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/v1/reminders"},"body":{"mode":"raw","raw":"{\n  \"noteId\": {{noteId}},\n  \"reminderTime\": \"2026-12-31T10:30:00\"\n}"}}},
+        {"name":"Update Reminder","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"},{"key":"Content-Type","value":"application/json"}],"url":{"raw":"{{baseUrl}}/api/v1/reminders/{{reminderId}}"},"body":{"mode":"raw","raw":"{\n  \"noteId\": {{noteId}},\n  \"reminderTime\": \"2027-01-01T09:00:00\"\n}"}}},
+        {"name":"Get Reminder","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/reminders/{{reminderId}}"}}},
+        {"name":"List Reminders","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/reminders"}}},
+        {"name":"Delete Reminder","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/reminders/{{reminderId}}"}}}
+      ]
+    },
+    {
+      "name": "Files",
+      "item": [
+        {"name":"Upload File","request":{"method":"POST","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/files/upload?noteId={{noteId}}"},"body":{"mode":"formdata","formdata":[{"key":"file","type":"file","src":""}]}}},
+        {"name":"List Files By Note","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/files/note/{{noteId}}"}}},
+        {"name":"Get File","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/files/{{fileId}}"}}},
+        {"name":"Delete File","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/files/{{fileId}}"}}}
+      ]
+    },
+    {
+      "name": "Notifications",
+      "item": [
+        {"name":"List Notifications","request":{"method":"GET","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notifications"}}},
+        {"name":"Mark Notification Read","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notifications/{{notificationId}}/read?value=true"}}},
+        {"name":"Mark All Read","request":{"method":"PUT","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notifications/read-all"}}},
+        {"name":"Delete Notification","request":{"method":"DELETE","header":[{"key":"Authorization","value":"Bearer {{token}}"}],"url":{"raw":"{{baseUrl}}/api/v1/notifications/{{notificationId}}"}}}
+      ]
+    },
+    {
+      "name": "Admin",
+      "item": [
+        {
+          "name": "User Count",
+          "request": {
+            "method": "GET",
+            "header": [{ "key": "Authorization", "value": "Bearer {{adminToken}}" }],
+            "url": { "raw": "{{baseUrl}}/api/v1/admin/users/count" }
+          }
+        }
+      ]
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost:8080" },
+    { "key": "token", "value": "" },
+    { "key": "refreshToken", "value": "" },
+    { "key": "adminToken", "value": "" },
+    { "key": "emailVerificationToken", "value": "" },
+    { "key": "noteId", "value": "1" },
+    { "key": "labelId", "value": "1" },
+    { "key": "notificationId", "value": "1" },
+    { "key": "reminderId", "value": "1" },
+    { "key": "fileId", "value": "1" }
+  ]
+}
